@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-# YouTube動画ダウンロードライブラリ
+# ダウンロードライブラリ
 import yt_dlp
 
 # OSライブラリ
