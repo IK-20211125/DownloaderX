@@ -16,7 +16,7 @@ def main():
     # ウィンドウを作成
     window = tk.Tk()
     
-    # 左上のアイコン変更
+    # 左上のアイコン変更（Windows用）
     # iconfile = './cat.ico'
     # window.iconbitmap(default=iconfile)
     
@@ -24,7 +24,7 @@ def main():
     window.title("DownloaderX")
 
     # ウィンドウのサイズを設定
-    window.geometry("400x300")
+    window.geometry("500x360")
 
     # ラベル1 を作成して配置
     label1 = tk.Label(window, text="URL")
@@ -76,11 +76,14 @@ def main():
         # PATH取得
         path = entry_path.get()
 
-        # PATH指定されない場合、Videosフォルダ配下にYTDLファルダ作成
+        # PATH指定されない場合、OSごとのフォルダ配下にファルダ作成
         if path == "":
-            path = (
-                os.getenv("HOMEDRIVE") + os.getenv("HOMEPATH") + "\\Videos" + "\\YTDL"
-            )
+            if os.name == "nt":  # Windows
+                path = os.path.join(os.getenv("HOMEDRIVE"), os.getenv("HOMEPATH"), "Videos", "DownloaderX")
+            elif os.name == "posix":  # macOS
+                path = os.path.join(os.path.expanduser("~"), "Movies", "DownloaderX")
+            else:
+                raise OSError("Unsupported operating system")
 
         # 別スレッドで動画のダウンロードを実行
         thread_download = threading.Thread(
@@ -134,7 +137,7 @@ def download_video(url, path, flag, pb):
     # オプション設定
     ydl_opts = {
         "outtmpl": os.path.join(path, f'%(title)s{"" if flag == 2 else ".mp4"}'),
-        "format": "bestaudio" if flag == 2 else "best[ext=mp4]",
+        "format": "bestaudio" if flag == 2 else "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
         "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}] if flag == 2 else [],
     }
 
@@ -145,6 +148,7 @@ def download_video(url, path, flag, pb):
             ydl.download([url])
         # プログレスバー破壊
         pb.destroy()
+        print("--- Download Completed ! ---")
     except Exception as e:
         # プログレスバー破壊
         pb.destroy()
