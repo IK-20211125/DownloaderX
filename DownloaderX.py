@@ -1,25 +1,19 @@
-# GuIライブラリ
-import tkinter as tk
-from tkinter import ttk, messagebox
-
-# ダウンロードライブラリ
-import yt_dlp
-
-# OSライブラリ
 import os
-
-# マルチスレッド処理ライブラリ
 import threading
+import tkinter as tk
+from tkinter import messagebox, ttk
+
+import yt_dlp
 
 
 def main():
     # ウィンドウを作成
     window = tk.Tk()
-    
+
     # 左上のアイコン変更（Windows用）
     # iconfile = './cat.ico'
     # window.iconbitmap(default=iconfile)
-    
+
     # ウィンドウのタイトルを設定
     window.title("DownloaderX")
 
@@ -79,7 +73,12 @@ def main():
         # PATH指定されない場合、OSごとのフォルダ配下にファルダ作成
         if path == "":
             if os.name == "nt":  # Windows
-                path = os.path.join(os.getenv("HOMEDRIVE"), os.getenv("HOMEPATH"), "Videos", "DownloaderX")
+                path = os.path.join(
+                    os.getenv("HOMEDRIVE"),
+                    os.getenv("HOMEPATH"),
+                    "Videos",
+                    "DownloaderX",
+                )
             elif os.name == "posix":  # macOS
                 path = os.path.join(os.path.expanduser("~"), "Movies", "DownloaderX")
             else:
@@ -103,7 +102,6 @@ def main():
 
 # プログレスバーを作成する関数
 def progressbar_set(window):
-    
     # プログレスバーのスタイルを設定
     style = ttk.Style()
     style.theme_use("default")
@@ -127,18 +125,21 @@ def progressbar_set(window):
     )
     # 設置
     pb.pack(pady=10, padx=10)
-    
+
     return pb
 
 
 # 指定したURL上の動画をダウンロードする関数
 def download_video(url, path, flag, pb):
-    
     # オプション設定
     ydl_opts = {
         "outtmpl": os.path.join(path, f'%(title)s{"" if flag == 2 else ".mp4"}'),
-        "format": "bestaudio" if flag == 2 else "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
-        "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}] if flag == 2 else [],
+        "format": "bestaudio"
+        if flag == 2
+        else "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
+        "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}]
+        if flag == 2
+        else [],
     }
 
     # ダウンロード実行
@@ -154,7 +155,6 @@ def download_video(url, path, flag, pb):
         pb.destroy()
         # エラー表示
         messagebox.showerror("Error", "Download failed.")
-
 
 
 if __name__ == "__main__":
